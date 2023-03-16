@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kyle Audio</title>
+    <link rel="stylesheet" href="./assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" integrity="sha512-HK5fgLBL+xu6dm/Ii3z4xhlSUyZgTT9tuc/hSrtw6uzJOvgRr2a9jyxxT1ely+B+xFAmJKVSTbpM/CuL7qxO8w==" crossorigin="anonymous" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+
+    <div class="player">
+        <!-- Dashboard -->
+        <div class="dashboard">
+            <!-- Header -->
+            <header>
+                <h4>Now playing:</h4>
+                <h2>String 57th & 9th</h2>
+            </header>
+
+            <!-- CD -->
+            <div class="cd">
+                <div class="cd-thumb" style="background-image: url('./assets/img/DefaultMusic.jpg')">
+                </div>
+            </div>
+
+            <!-- Control -->
+            <div class="control">
+                <div class="btn btn-repeat">
+                    <i class="fas fa-redo"></i>
+                </div>
+                <div class="btn btn-prev">
+                    <i class="fas fa-step-backward"></i>
+                </div>
+                <div class="btn btn-toggle-play">
+                    <i class="fas fa-pause icon-pause"></i>
+                    <i class="fas fa-play icon-play"></i>
+                </div>
+                <div class="btn btn-next">
+                    <i class="fas fa-step-forward"></i>
+                </div>
+                <div class="btn btn-random">
+                    <i class="fas fa-random"></i>
+                </div>
+            </div>
+
+            <input id="progress" class="progress" type="range" value="0" step="1" min="0" max="100">
+
+            <audio id="audio" src=""></audio>
+        </div>
+
+        <!-- Playlist -->
+        <div class="playlist">
+            <div class="song">
+                <div class="thumb" style="background-image: url('https://i.ytimg.com/vi/jTLhQf5KJSc/maxresdefault.jpg')">
+                </div>
+                <div class="body">
+                    <h3 class="title">Music name</h3>
+                    <p class="author">Singer</p>
+                </div>
+                <div class="option">
+                    <i class="fas fa-ellipsis-h"></i>
+                </div>
+            </div>
+            <div class="song">
+                <div class="thumb" style="background-image: url('https://i.ytimg.com/vi/jTLhQf5KJSc/maxresdefault.jpg')">
+                </div>
+                <div class="body">
+                    <h3 class="title">Music name</h3>
+                    <p class="author">Singer</p>
+                </div>
+                <div class="option">
+                    <i class="fas fa-ellipsis-h"></i>
+                </div>
+            </div>
+            <div class="song">
+                <div class="thumb" style="background-image: url('https://i.ytimg.com/vi/jTLhQf5KJSc/maxresdefault.jpg')">
+                </div>
+                <div class="body">
+                    <h3 class="title">Music name</h3>
+                    <p class="author">Singer</p>
+                </div>
+                <div class="option">
+                    <i class="fas fa-ellipsis-h"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const $ = document.querySelector.bind(document)
+        const $$ = document.querySelectorAll.bind(document)
+
+        const PLAYER_STORAGE_KEY = 'KYLE_PLAYER'
+
+        const player = $('.player')
+        const heading = $('header h2')
+        const cdThumb = $('.cd-thumb')
+        const audio = $('#audio')
+        const cd = $('.cd')
+        const playBtn = $('.btn-toggle-play')
+        const progress = $('#progress')
+        const nextBtn = $('.btn-next')
+        const prevBtn = $('.btn-prev')
+        const randomBtn = $('.btn-random')
+        const repeatBtn = $('.btn-repeat')
+        const playlist = $('.playlist')
+
+        const app = {
+            currnetIndex: 0,
+            isPlaying: false,
+            isRandom: false,
+            isRepeat: false,
+            config: JSON.parse(localStorage.getItem(PLAYER_STORAGE_KEY)) || {},
+            songs: [{
+                name: 'You Are The Reason',
+                singer: 'Calum Scott',
+                path: './assets/music/Calum Scott - You Are The Reason (Official Video).mp3',
+                img: './assets/img/YouAreTheReason.jpg'
+            }, {
+                name: 'I Want It That Way',
+                singer: 'Backstreet Boys',
+                path: './assets/music/Backstreet Boys - I Want It That Way (Official HD Video).mp3',
+                img: './assets/img/IWantItThatWay.jpg'
+            }, {
+                name: 'How Long',
+                singer: 'Charlie Puth',
+                path: './assets/music/Charlie Puth - -How Long- [Official Video].mp3',
+                img: './assets/img/CharliePuth.jpg'
+            }, {
+                name: 'Cheating In You',
+                singer: 'Charlie Puth',
+                path: './assets/music/Charlie Puth - Cheating on You [Official Video].mp3',
+                img: './assets/img/CharliePuth.jpg'
+            }, {
+                name: 'Loser',
+                singer: 'Charlie Puth',
+                path: './assets/music/Charlie Puth - Loser (Official Music Video).mp3',
+                img: './assets/img/CharliePuth.jpg'
+            }, {
+                name: 'One Call Away',
+                singer: 'Charlie Puth',
+                path: './assets/music/Charlie Puth - One Call Away [Official Video].mp3',
+                img: './assets/img/CharliePuth.jpg'
+            }, {
+                name: 'Perfect',
+                singer: 'Ed Sheeran',
+                path: './assets/music/Ed Sheeran - Perfect (Official Music Video).mp3',
+                img: './assets/img/Ed.jpg'
+            }, {
+                name: 'What Makes You Beautiful',
+                singer: 'One Direction',
+                path: './assets/music/One Direction - What Makes You Beautiful (Official Video).mp3',
+                img: './assets/img/OneDirection.jpg'
+            }, {
+                name: 'Let Her Go',
+                singer: 'Passenger',
+                path: './assets/music/Passenger - Let Her Go (Official Video).mp3',
+                img: './assets/img/Passenger.jpg'
+            }, {
+                name: 'Im Not The Only One',
+                singer: 'Sam Smith',
+                path: './assets/music/Sam Smith - Im Not The Only One (Official Music Video).mp3',
+                img: './assets/img/SamSmith.jpg'
+            }, {
+                name: 'Until I Found You',
+                singer: 'Stephen Sanchez',
+                path: './assets/music/Stephen Sanchez - Until I Found You (Official Music Video).mp3',
+                img: './assets/img/UntilIFoundU.jpg'
+            }, {
+                name: 'Closer',
+                singer: 'The Chainsmokers ft. Halsey',
+                path: './assets/music/The Chainsmokers - Closer (Lyric) ft. Halsey.mp3',
+                img: './assets/img/TheChainSmokers.jpg'
+            }],
+            setConfig: function(key, value) {
+                this.config[key] = value;
+                localStorage.setItem(PLAYER_STORAGE_KEY, JSON.stringify(this.config))
+            },
+            render: function() {
+                const htmls = this.songs.map((song, index) => {
+                    return `
+                    <div class="song ${index === this. currnetIndex ? 'active' : ''}" data-index="${index}">
+                        <div class="thumb" style="background-image: url('${song.img}')">
+                        </div>
+                        <div class="body">
+                            <h3 class="title">${song.name}</h3>
+                            <p class="author">${song.singer}</p>
+                        </div>
+                        <div class="option">
+                            <i class="fas fa-ellipsis-h"></i>
+                        </div>
+                    </div>
+                    `
+                })
+                playlist.innerHTML = htmls.join('')
+            },
+            defineProperties: function() {
+                Object.defineProperty(this, 'currentSong', {
+                    get: function() {
+                        return this.songs[this.currnetIndex]
+                    }
+                })
+            },
+            handleEvents: function() {
+                const cdWidth = cd.offsetWidth
+                    //Xu ly CD
+                cdThumbAnimate = cdThumb.animate([{
+                    transform: 'rotate(360deg)'
+                }], {
+                    duration: 10000, //10secs
+                    iterations: Infinity
+                })
+                cdThumbAnimate.pause()
+
+                document.onscroll = function() {
+                        const scrollTop = window.scrollY || document.documentElement.scrollTop
+                        const newCdWidth = cdWidth - scrollTop
+                        cd.style.width = newCdWidth > 0 ? newCdWidth + 'px' : 0
+                        cd.style.opacity = newCdWidth / cdWidth
+                    }
+                    //Xu ly khi play
+                playBtn.onclick = function() {
+                        if (app.isPlaying) {
+                            audio.pause()
+                        } else {
+                            audio.play()
+                        }
+                    }
+                    //khi song duoc play
+                audio.onplay = function() {
+                        app.isPlaying = true
+                        player.classList.add('playing')
+                        cdThumbAnimate.play()
+                    }
+                    //Khi song pause
+                audio.onpause = function() {
+                        app.isPlaying = false
+                        player.classList.remove('playing')
+                        cdThumbAnimate.pause()
+                    }
+                    //Thay chay progress song thay doi
+                audio.ontimeupdate = function() {
+                        if (audio.duration) {
+                            const progressPercent = Math.floor(audio.currentTime / audio.duration * 100)
+                            progress.value = progressPercent
+                        }
+                    }
+                    //Tua song
+                progress.onchange = function(e) {
+                        const seekTime = audio.duration / 100 * e.target.value
+                        audio.currentTime = seekTime
+                    }
+                    //Khi next song
+                nextBtn.onclick = function() {
+                        if (app.isRandom) {
+                            app.playRandomSong()
+                        } else {
+                            app.nextSong()
+                        }
+                        audio.play()
+                        app.render()
+                        app.scrollToActiveSong()
+                    }
+                    //Khi prev song
+                prevBtn.onclick = function() {
+                        if (app.isRandom) {
+                            app.playRandomSong()
+                        } else {
+                            app.prevSong()
+                        }
+                        audio.play()
+                        app.render()
+                        app.scrollToActiveSong()
+                    }
+                    //Xu ly random song
+                randomBtn.onclick = function() {
+                        app.isRandom = !app.isRandom
+                        app.setConfig('isRandom', app.isRandom)
+                        randomBtn.classList.toggle('active', app.isRandom)
+                    }
+                    //Xu ly repeat song
+                repeatBtn.onclick = function() {
+                        app.isRepeat = !app.isRepeat
+                        app.setConfig('isRepeat', app.isRepeat)
+                        repeatBtn.classList.toggle('active', app.isRepeat)
+                    }
+                    //Xu ly khi song ket thuc
+                audio.onended = function() {
+                        if (app.isRepeat) {
+                            audio.play()
+                        } else {
+                            nextBtn.click()
+                        }
+                    }
+                    //Click vao playlist
+                playlist.onclick = function(e) {
+                    const songNode = e.target.closest('.song:not(.active)')
+                    if (songNode || e.target.closest('option')) {
+                        //click vao song
+                        if (songNode) {
+                            app.currnetIndex = Number(songNode.dataset.index)
+                            app.loadCurrentSong()
+                            app.render()
+                            audio.play()
+                        }
+                        //click vao song option
+                        if (e.target.closest('option')) {}
+                    }
+                }
+            },
+            scrollToActiveSong: function() {
+                setTimeout(() => {
+                    $('.song.active').scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center',
+                    })
+                }, 250)
+            },
+            loadCurrentSong: function() {
+                heading.textContent = this.currentSong.name
+                cdThumb.style.backgroundImage = `url('${this.currentSong.img}')`
+                audio.src = this.currentSong.path
+            },
+            loadConfig: function() {
+                this.isRandom = this.config.isRandom
+                this.isRepeat = this.config.isRepeat
+
+            },
+            nextSong: function() {
+                this.currnetIndex++
+                    if (this.currnetIndex >= this.songs.length) {
+                        this.currnetIndex = 0
+                    }
+                this.loadCurrentSong()
+            },
+            prevSong: function() {
+                this.currnetIndex--
+                    if (this.currnetIndex < 0) {
+                        this.currnetIndex = this.songs.length - 1
+                    }
+                this.loadCurrentSong()
+            },
+            playRandomSong: function() {
+                let newIndex
+                do {
+                    newIndex = Math.floor(Math.random() * this.songs.length)
+                } while (newIndex === this.currnetIndex)
+                this.currnetIndex = newIndex
+                this.loadCurrentSong()
+            },
+            start: function() {
+                //gan cau hinh tu config vao app
+                this.loadConfig()
+                    //Dinh nghia cac thuoc tinh cho Object
+                this.defineProperties()
+
+                //Xu ly cac DOM events
+                this.handleEvents()
+
+                //Tai thong tin bai hat dau tien vao UI khi start
+                this.loadCurrentSong()
+
+                //Render Playlist
+                this.render()
+                    //hien thi trang thai ban dau cua 2 btn
+                randomBtn.classList.toggle('active', app.isRandom)
+                repeatBtn.classList.toggle('active', app.isRepeat)
+            }
+        }
+
+        app.start()
+    </script>
+</body>
+
+</html>
